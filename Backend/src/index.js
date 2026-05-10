@@ -24,7 +24,7 @@ app.use("/api/auth" , authRoutes)
 
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, ()=>{
+app.listen(PORT,"0.0.0.0" , ()=>{
     console.log("the server is listening ");
 });
 
