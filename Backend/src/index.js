@@ -2,6 +2,8 @@ import express from "express";
 import cors from "cors";
 import postRoutes from "./routes/postRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
+import commentRoutes from "./routes/commentRoutes.js"
+
 import dotenv from "dotenv";
 import { connectDB } from "../config/db.js";
 
@@ -23,6 +25,7 @@ connectDB();
 
 app.use("/api/posts" , postRoutes)
 app.use("/api/auth" , authRoutes)
+app.use("/api/comments" , commentRoutes)
 
 const PORT = process.env.PORT || 3000;
 

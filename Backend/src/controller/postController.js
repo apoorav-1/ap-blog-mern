@@ -4,12 +4,12 @@ import Post from "../model/Post.js";
 
 export const createPost = async(req,res)=>{
 
-    const {title , content } = req.body;
+    const {title , content , userId } = req.body;
     const username = req.user.username;
 
     try {
 
-        const newPost = new Post({title , content , username});
+        const newPost = new Post({title , content , username , userId});
         const savedPost = await newPost.save();
         res.json(savedPost);
         
@@ -24,6 +24,8 @@ export const createPost = async(req,res)=>{
 export const getAllPost = async(req,res)=>{
 
     const query = req.query.search;
+    const tagQuery = req.query.tag;
+
   
     try {
 
@@ -38,7 +40,12 @@ export const getAllPost = async(req,res)=>{
                 ],
             });
 
-        }else{
+        }
+        else if(tagQuery){
+
+            posts = (await Post.find({tags: {$in: [tagQuery] } } )).toSorted({createdAt: -1}); 
+        }
+        else{
             posts = await Post.find().sort({createdAt: -1});
 
         }
@@ -141,7 +148,56 @@ export const updatePost = async(req,res)=>{
 };
 
 
+export const toggleLikePost = async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+    // req.user.id comes directly from your verifyToken middleware!
+    const userId = req.user._id || req.user.id;
+    if (post.likes.includes(userId)) {
+      // Already liked, so unlike it
+      await Post.findByIdAndUpdate(req.params.id, { $pull: { likes: userId } });
+      res.status(200).json("Post unliked");
+    } else {
+      // Not liked yet, so add the like
+      await Post.findByIdAndUpdate(req.params.id, { $push: { likes: userId } });
+      res.status(200).json("Post liked");
+    }
+  } catch (err) {
+    res.status(500).json(err);
+  }
+};
 
+
+
+
+export const getPosts = async (req, res) => {
+  const qTag = req.query.tag;
+  try {
+    let posts;
+    if (qTag) {
+      // Find posts where the tags array contains the queried tag
+      posts = await Post.find({ tags: { $in: [qTag] } });
+    } else {
+      posts = await Post.find();
+    }
+    res.status(200).json(posts);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+};
+
+
+export const getUserPosts = async (req, res) => {
+  try {
+    
+    console.log("the incoming target userID parameter is " , req.params.userID);
+    const posts = await Post.find({ userId: req.params.userID });
+    console.log("database found matching doc " , posts.length);
+    res.status(200).json(posts);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+};
 
 
 

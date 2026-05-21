@@ -89,3 +89,33 @@ export const login = async(req,res)=>{
         
     }
 };
+
+
+
+
+// UPDATE USER PASSWORD
+export const updatePassword = async (req, res) => {
+  // Validate that the logged-in user matches the ID in the request path
+  if (req.user.id === req.params.id || req.user._id === req.params.id) {
+    try {
+      // 1. Generate salt and hash the incoming new password safely
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(req.body.password, salt);
+
+      // 2. Update the password field inside the MongoDB document
+      const updatedUser = await User.findByIdAndUpdate(
+        req.params.id,
+        { $set: { password: hashedPassword } },
+        { new: true } // Returns the freshly updated document configuration
+      );
+
+      // 3. Destructure to omit the password hash from the returning JSON response
+      const { password, ...otherDetails } = updatedUser._doc;
+      res.status(200).json({ message: "Password updated successfully!", user: otherDetails });
+    } catch (err) {
+      res.status(500).json(err);
+    }
+  } else {
+    res.status(403).json("You are authorized to update only your own account profile!");
+  }
+};

@@ -18,7 +18,6 @@ const Navbar = () => {
 
   return (
     <div className="navbar bg-base-100 shadow-md px-4 md:px-12 sticky top-0 z-50">
-      
       {/* 1. LEFT SIDE: Logo */}
       <div className="navbar-start">
         <Link to="/" className="text-2xl font-bold tracking-tighter">
@@ -41,23 +40,59 @@ const Navbar = () => {
         </form>
       </div>
 
-      {/* 3. RIGHT SIDE: Buttons */}
+      {/* 3. RIGHT SIDE: Buttons & Dropdown */}
       <div className="navbar-end gap-2">
         {user ? (
           <div className="flex items-center gap-3">
+            {/* Create Post Button */}
             <Link to="/write" className="btn btn-primary btn-sm rounded-md">
               Create
             </Link>
-            <button onClick={handleLogout} className="btn btn-ghost btn-sm border border-base-300">
-              Logout
-            </button>
-            {user && (
-            <div className="avatar placeholder ml-2">
-              <div className="bg-neutral text-neutral-content w-8 h-8 rounded-full">
-                <span className="text-xs">{user?.username ? user.username[0].toUpperCase() : "U"}</span>
+
+            {/* DAISYUI PROFILE DROPDOWN MENU */}
+            <div className="dropdown dropdown-end">
+              <div 
+                tabIndex={0} 
+                role="button" 
+                className="avatar placeholder ml-2 cursor-pointer focus:outline-none"
+              >
+                <div className="bg-neutral text-neutral-content w-8 h-8 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2 hover:opacity-90 transition-all">
+                  <span className="text-xs">
+                    {user?.username ? user.username[0].toUpperCase() : "U"}
+                  </span>
+                </div>
               </div>
+              <ul
+                tabIndex={0}
+                className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52 border border-base-200 gap-1"
+              >
+                <li className="menu-title text-xs font-bold px-4 py-2 border-b border-base-200 mb-1">
+                  Hi, {user.username}
+                </li>
+                <li>
+                  {/* CHANGED TO MY BLOGS */}
+                  <Link to={`/my-blogs/${user._id}`} className="justify-between py-2">
+                    My Blogs
+                  </Link>
+                </li>
+                <li>
+                  {/* CHANGED TO CHANGE PASSWORD */}
+                  <Link to="/change-password" className="py-2">
+                    Change Password
+                  </Link>
+                </li>
+                <hr className="border-base-200 my-1" />
+                <li>
+                  <button 
+                    onClick={handleLogout} 
+                    className="text-error hover:bg-error/10 font-medium py-2"
+                  >
+                    Logout
+                  </button>
+                </li>
+              </ul>
             </div>
-            )}
+
           </div>
         ) : (
           <div className="flex gap-2">
